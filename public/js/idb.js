@@ -25,4 +25,14 @@ request.onsuccess = function(event) {
 request.onerror = function(event) {
     // log error here
     console.log(event.target.errorCode);
+};
+
+// executed when submit is attempted, but no iternet connection
+function saveFund(fund) {
+    // open new transaction w/ db w/ read and write permession
+    const transaction = db.transaction(['new_fund', 'readwrite']);
+    // access obj store for new_fund
+    const fundObjectStore = transaction.objectStore('new_fund');
+    // add record to my store with add method
+    fundObjectStore.add(fund);
 }

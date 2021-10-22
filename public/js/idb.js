@@ -30,7 +30,7 @@ request.onerror = function(event) {
 // executed when submit is attempted, but no iternet connection
 function saveRecord(fund) {
     // open new transaction w/ db w/ read and write permession
-    const transaction = db.transaction(['new_fund', 'readwrite']);
+    const transaction = db.transaction(['new_fund'], 'readwrite');
     // access obj store for new_fund
     const fundObjectStore = transaction.objectStore('new_fund');
     // add record to my store with add method
@@ -45,34 +45,37 @@ function uploadFund() {
     // get all records from store and set to a variable
     const getAll = fundObjectStore.getAll();
 
-    // if ther is data in indexedDB then send to api server
-    if (getAll.result.length > 0) {
-        fetch("/api/transaction", {
-            method: "POST",
-            body: JSON.stringify(transaction),
-            headers: {
-              Accept: "application/json, text/plain, */*",
-              "Content-Type": "application/json"
-            }
-        })
-        .then(response => response.json())
-        .then(serverResponse => {
-            if (serverResponse.message) {
-                throw new Error(serverResponse);
-            }
-            // open one more transaction
-            const transaction = db.transaction(['new_fund'], 'readwrite');
-            // access new_fund obj store
-            const fundObjectStore = transaction.objectStore('new_fund');
-            // clear all items in store
-            fundObjectStore.clear();
+    // upon a successful .getAll() execution, run this function 
+    getAll.onsuccess = function() {
+    // if there is data in indexedDB then send to api server
+        if (getAll.result.length > 0) {
+            fetch("/api/transaction", {
+                method: "POST",
+                body: JSON.stringify(transaction),
+                headers: {
+                Accept: "application/json, text/plain, */*",
+                "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(serverResponse => {
+                if (serverResponse.message) {
+                    throw new Error(serverResponse);
+                }
+                // open one more transaction
+                const transaction = db.transaction(['new_fund'], 'readwrite');
+                // access new_fund obj store
+                const fundObjectStore = transaction.objectStore('new_fund');
+                // clear all items in store
+                fundObjectStore.clear();
 
-            alert('All funds saved and submitted!')
-        })
-        .catch(err => {
-            console.log(err);
-        })
-    }
+                alert('All funds saved and submitted!')
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        }
+    };
 }
 
 

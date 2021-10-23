@@ -49,9 +49,9 @@ function uploadFund() {
     getAll.onsuccess = function() {
     // if there is data in indexedDB then send to api server
         if (getAll.result.length > 0) {
-            fetch("/api/transaction", {
+            fetch("/api/transaction/bulk", {
                 method: "POST",
-                body: JSON.stringify(transaction),
+                body: JSON.stringify(getAll.result),
                 headers: {
                 Accept: "application/json, text/plain, */*",
                 "Content-Type": "application/json"

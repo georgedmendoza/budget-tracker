@@ -4,7 +4,7 @@ const VERSION = 'version_01';
 // const CACHE_NAME = 'BudgetTracker-v1';
 const CACHE_NAME = APP_PREFIX + VERSION;
 
-const DATA_CACHE = 'data-v1';
+const DATA_CACHE = 'data-' + VERSION ;
 const FILES_TO_CACHE = [
   "/",
   "/index.html",
@@ -52,7 +52,7 @@ self.addEventListener('install', function (e) {
 // });
 
 self.addEventListener('fetch', function (e) {
-  if (e.request.url.includes('/api')) {
+  if (e.request.url.includes('/api/')) {
     e.respondWith(
       caches.open(DATA_CACHE)
         .then(cache => {
@@ -83,22 +83,22 @@ self.addEventListener('fetch', function (e) {
 })
 
 
-// self.addEventListener('activate', function(e) {
-//   e.waitUntil(
-//     caches.keys().then(function(keyList) {
-//       let cacheKeeplist = keyList.filter(function(key) {
-//         return key.indexOf(APP_PREFIX);
-//       });
-//       cacheKeeplist.push(CACHE_NAME);
+self.addEventListener('activate', function(e) {
+  e.waitUntil(
+    caches.keys().then(function(keyList) {
+      let cacheKeeplist = keyList.filter(function(key) {
+        return key.indexOf(APP_PREFIX);
+      });
+      cacheKeeplist.push(CACHE_NAME);
 
-//       return Promise.all(
-//         keyList.map(function(key, i) {
-//           if (cacheKeeplist.indexOf(key) === -1) {
-//             console.log('deleting cache : ' + keyList[i]);
-//             return caches.delete(keyList[i]);
-//           }
-//         })
-//       );
-//     })
-//   );
-// });
+      return Promise.all(
+        keyList.map(function(key, i) {
+          if (cacheKeeplist.indexOf(key) === -1) {
+            console.log('deleting cache : ' + keyList[i]);
+            return caches.delete(keyList[i]);
+          }
+        })
+      );
+    })
+  );
+});
